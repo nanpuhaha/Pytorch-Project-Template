@@ -73,7 +73,7 @@ class DQNAgent(BaseAgent):
     def load_checkpoint(self, file_name):
         filename = self.config.checkpoint_dir + file_name
         try:
-            self.logger.info("Loading checkpoint '{}'".format(filename))
+            self.logger.info(f"Loading checkpoint '{filename}'")
             checkpoint = torch.load(filename)
 
             self.current_episode = checkpoint['episode']
@@ -81,10 +81,15 @@ class DQNAgent(BaseAgent):
             self.policy_model.load_state_dict(checkpoint['state_dict'])
             self.optim.load_state_dict(checkpoint['optimizer'])
 
-            self.logger.info("Checkpoint loaded successfully from '{}' at (epoch {}) at (iteration {})\n"
-                  .format(self.config.checkpoint_dir, checkpoint['episode'], checkpoint['iteration']))
+            self.logger.info(
+                f"Checkpoint loaded successfully from '{self.config.checkpoint_dir}' at (epoch {checkpoint['episode']}) at (iteration {checkpoint['iteration']})\n"
+            )
+
         except OSError as e:
-            self.logger.info("No checkpoint exists from '{}'. Skipping...".format(self.config.checkpoint_dir))
+            self.logger.info(
+                f"No checkpoint exists from '{self.config.checkpoint_dir}'. Skipping..."
+            )
+
             self.logger.info("**First time to train**")
 
     def save_checkpoint(self, file_name="checkpoint.pth.tar", is_best=0):
@@ -98,8 +103,10 @@ class DQNAgent(BaseAgent):
         torch.save(state, self.config.checkpoint_dir + file_name)
         # If it is the best copy it to another file 'model_best.pth.tar'
         if is_best:
-            shutil.copyfile(self.config.checkpoint_dir + file_name,
-                            self.config.checkpoint_dir + 'model_best.pth.tar')
+            shutil.copyfile(
+                self.config.checkpoint_dir + file_name,
+                f'{self.config.checkpoint_dir}model_best.pth.tar',
+            )
 
     def run(self):
         """
@@ -124,11 +131,10 @@ class DQNAgent(BaseAgent):
         eps_threshold = self.config.eps_start + (self.config.eps_start - self.config.eps_end) * math.exp(
             -1. * self.current_iteration / self.config.eps_decay)
         self.current_iteration += 1
-        if sample > eps_threshold:
-            with torch.no_grad():
-                return self.policy_model(state).max(1)[1].view(1, 1)
-        else:
+        if sample <= eps_threshold:
             return torch.tensor([[random.randrange(2)]], device=self.device, dtype=torch.long)
+        with torch.no_grad():
+            return self.policy_model(state).max(1)[1].view(1, 1)
 
     def optimize_policy_model(self):
         """
@@ -202,26 +208,18 @@ class DQNAgent(BaseAgent):
         # get state
         curr_state = curr_frame - prev_frame
 
-        while(1):
+        while 1:
             episode_duration += 1
             # select action
             action = self.select_action(curr_state)
             # perform action and get reward
             _, reward, done, _ = self.env.step(action.item())
 
-            if self.cuda:
-                reward = torch.Tensor([reward]).to(self.device)
-            else:
-                reward = torch.Tensor([reward]).to(self.device)
-
+            reward = torch.Tensor([reward]).to(self.device)
             prev_frame = curr_frame
             curr_frame = self.cartpole.get_screen(self.env)
             # assign next state
-            if done:
-                next_state = None
-            else:
-                next_state = curr_frame - prev_frame
-
+            next_state = None if done else curr_frame - prev_frame
             # add this transition into memory
             self.memory.push_transition(curr_state, action, next_state, reward)
 
@@ -249,5 +247,8 @@ class DQNAgent(BaseAgent):
         """
         self.logger.info("Please wait while finalizing the operation.. Thank you")
         self.save_checkpoint()
-        self.summary_writer.export_scalars_to_json("{}all_scalars.json".format(self.config.summary_dir))
+        self.summary_writer.export_scalars_to_json(
+            f"{self.config.summary_dir}all_scalars.json"
+        )
+
         self.summary_writer.close()

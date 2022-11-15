@@ -15,10 +15,10 @@ class IOUMetric:
 
     def _fast_hist(self, label_pred, label_true):
         mask = (label_true >= 0) & (label_true < self.num_classes)
-        hist = np.bincount(
-            self.num_classes * label_true[mask].astype(int) +
-            label_pred[mask], minlength=self.num_classes ** 2).reshape(self.num_classes, self.num_classes)
-        return hist
+        return np.bincount(
+            self.num_classes * label_true[mask].astype(int) + label_pred[mask],
+            minlength=self.num_classes**2,
+        ).reshape(self.num_classes, self.num_classes)
 
     def add_batch(self, predictions, gts):
         for lp, lt in zip(predictions, gts):

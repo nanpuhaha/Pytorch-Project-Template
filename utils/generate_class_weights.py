@@ -32,7 +32,7 @@ class VOC(data.Dataset):
     def __getitem__(self, index):
         if self.mode == 'test':
             img_path, img_name = self.imgs[index]
-            img = Image.open(os.path.join(img_path, img_name + '.jpg')).convert('RGB')
+            img = Image.open(os.path.join(img_path, f'{img_name}.jpg')).convert('RGB')
             if self.transform is not None:
                 img = self.transform(img)
             return img_name, img

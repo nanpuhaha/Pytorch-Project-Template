@@ -22,5 +22,4 @@ class Example(nn.Module):
         x = self.conv(x)
         x = self.relu(x)
 
-        out = x.view(x.size(0), -1)
-        return out
+        return x.view(x.size(0), -1)

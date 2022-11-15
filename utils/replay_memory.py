@@ -27,5 +27,4 @@ class ReplayMemory(object):
         self.position = (self.position + 1) % self.capacity  # for the cyclic buffer
 
     def sample_batch(self, batch_size):
-        batch = random.sample(self.memory, batch_size)
-        return batch
+        return random.sample(self.memory, batch_size)

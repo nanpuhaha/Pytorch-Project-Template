@@ -88,7 +88,7 @@ class DCGANAgent(BaseAgent):
     def load_checkpoint(self, file_name):
         filename = self.config.checkpoint_dir + file_name
         try:
-            self.logger.info("Loading checkpoint '{}'".format(filename))
+            self.logger.info(f"Loading checkpoint '{filename}'")
             checkpoint = torch.load(filename)
 
             self.current_epoch = checkpoint['epoch']
@@ -100,10 +100,15 @@ class DCGANAgent(BaseAgent):
             self.fixed_noise = checkpoint['fixed_noise']
             self.manual_seed = checkpoint['manual_seed']
 
-            self.logger.info("Checkpoint loaded successfully from '{}' at (epoch {}) at (iteration {})\n"
-                  .format(self.config.checkpoint_dir, checkpoint['epoch'], checkpoint['iteration']))
+            self.logger.info(
+                f"Checkpoint loaded successfully from '{self.config.checkpoint_dir}' at (epoch {checkpoint['epoch']}) at (iteration {checkpoint['iteration']})\n"
+            )
+
         except OSError as e:
-            self.logger.info("No checkpoint exists from '{}'. Skipping...".format(self.config.checkpoint_dir))
+            self.logger.info(
+                f"No checkpoint exists from '{self.config.checkpoint_dir}'. Skipping..."
+            )
+
             self.logger.info("**First time to train**")
 
     def save_checkpoint(self, file_name="checkpoint.pth.tar", is_best = 0):
@@ -121,8 +126,10 @@ class DCGANAgent(BaseAgent):
         torch.save(state, self.config.checkpoint_dir + file_name)
         # If it is the best copy it to another file 'model_best.pth.tar'
         if is_best:
-            shutil.copyfile(self.config.checkpoint_dir + file_name,
-                            self.config.checkpoint_dir + 'model_best.pth.tar')
+            shutil.copyfile(
+                self.config.checkpoint_dir + file_name,
+                f'{self.config.checkpoint_dir}model_best.pth.tar',
+            )
 
     def run(self):
         """
@@ -228,6 +235,9 @@ class DCGANAgent(BaseAgent):
         """
         self.logger.info("Please wait while finalizing the operation.. Thank you")
         self.save_checkpoint()
-        self.summary_writer.export_scalars_to_json("{}all_scalars.json".format(self.config.summary_dir))
+        self.summary_writer.export_scalars_to_json(
+            f"{self.config.summary_dir}all_scalars.json"
+        )
+
         self.summary_writer.close()
         self.dataloader.finalize()

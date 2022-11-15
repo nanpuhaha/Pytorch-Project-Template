@@ -16,8 +16,7 @@ palette = [0, 0, 0, 128, 0, 0, 0, 128, 0, 128, 128, 0, 0, 0, 128, 128, 0, 128, 0
            64, 128, 128, 192, 128, 128, 0, 64, 0, 128, 64, 0, 0, 192, 0, 128, 192, 0, 0, 64, 128]
 
 zero_pad = 256 * 3 - len(palette)
-for i in range(zero_pad):
-    palette.append(0)
+palette.extend(0 for _ in range(zero_pad))
 
 
 def colorize_mask(mask):
@@ -37,22 +36,27 @@ def make_dataset(mode, root):
         data_list = [l.strip('\n') for l in open(os.path.join(
             root, 'benchmark_RELEASE', 'dataset', 'train.txt')).readlines()]
         for it in data_list:
-            item = (os.path.join(img_path, it + '.jpg'), os.path.join(mask_path, it + '.mat'))
+            item = os.path.join(img_path, f'{it}.jpg'), os.path.join(
+                mask_path, f'{it}.mat'
+            )
+
             items.append(item)
-    elif mode == 'val' or mode == 'validate':
+    elif mode in ['val', 'validate']:
         img_path = os.path.join(root, 'VOCdevkit', 'VOC2012', 'JPEGImages')
         mask_path = os.path.join(root, 'VOCdevkit', 'VOC2012', 'SegmentationClass')
         data_list = [l.strip('\n') for l in open(os.path.join(
             root, 'VOCdevkit', 'VOC2012', 'ImageSets', 'Segmentation', 'seg11valid.txt')).readlines()]
         for it in data_list:
-            item = (os.path.join(img_path, it + '.jpg'), os.path.join(mask_path, it + '.png'))
+            item = os.path.join(img_path, f'{it}.jpg'), os.path.join(
+                mask_path, f'{it}.png'
+            )
+
             items.append(item)
-    elif mode == 'test' or mode == 'inference':
+    elif mode in ['test', 'inference']:
         img_path = os.path.join(root, 'VOCdevkit (test)', 'VOC2012', 'JPEGImages')
         data_list = [l.strip('\n') for l in open(os.path.join(
             root, 'VOCdevkit (test)', 'VOC2012', 'ImageSets', 'Segmentation', 'test.txt')).readlines()]
-        for it in data_list:
-            items.append((img_path, it))
+        items.extend((img_path, it) for it in data_list)
     else:
         raise Exception("Please choose proper mode for data")
     return items
@@ -60,9 +64,7 @@ def make_dataset(mode, root):
 
 class RandomVerticalFlip(object):
     def __call__(self, img):
-        if random.random() < 0.5:
-            return img.transpose(Image.FLIP_TOP_BOTTOM)
-        return img
+        return img.transpose(Image.FLIP_TOP_BOTTOM) if random.random() < 0.5 else img
 
 
 class DeNormalize(object):

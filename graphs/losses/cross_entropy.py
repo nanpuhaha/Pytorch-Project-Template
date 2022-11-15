@@ -12,7 +12,7 @@ import numpy as np
 class CrossEntropyLoss(nn.Module):
     def __init__(self, config=None):
         super(CrossEntropyLoss, self).__init__()
-        if config == None:
+        if config is None:
             self.loss = nn.CrossEntropyLoss()
         else:
             class_weights = np.load(config.class_weights)

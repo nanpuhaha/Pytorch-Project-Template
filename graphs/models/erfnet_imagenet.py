@@ -37,12 +37,12 @@ class Encoder(nn.Module):
 
         self.layers.append(DownsamplerBlock(16, 64))
 
-        for x in range(0, 5):  # 5 times
+        for _ in range(5):
             self.layers.append(non_bottleneck_1d(64, 0.1, 1))
 
         self.layers.append(DownsamplerBlock(64, 128))
 
-        for x in range(0, 2):  # 2 times
+        for _ in range(2):
             self.layers.append(non_bottleneck_1d(128, 0.1, 2))
             self.layers.append(non_bottleneck_1d(128, 0.1, 4))
             self.layers.append(non_bottleneck_1d(128, 0.1, 8))

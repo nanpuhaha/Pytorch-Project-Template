@@ -44,8 +44,15 @@ class LearnedGroupConv(nn.Module):
         self.check_if_drop()
         # To mask the output
         weight = self.conv.weight * self.mask
-        out_conv = F.conv2d(input=out, weight=weight, bias=None, stride=self.conv.stride, padding=self.conv.padding, dilation=self.conv.dilation, groups=1)
-        return out_conv
+        return F.conv2d(
+            input=out,
+            weight=weight,
+            bias=None,
+            stride=self.conv.stride,
+            padding=self.conv.padding,
+            dilation=self.conv.dilation,
+            groups=1,
+        )
 
     """
     Paper: Sec 3.1: Condensation procedure: number of epochs for each condensing stage: M/2(C-1)
@@ -57,12 +64,15 @@ class LearnedGroupConv(nn.Module):
         current_progress = LearnedGroupConv.global_progress
         delta = 0
         # Get current stage
-        for i in range(self.condense_factor - 1):   # 3 condensation stages
-            if current_progress * 2 < (i + 1) / (self.condense_factor - 1):
-                stage = i
-                break
-        else:
-            stage = self.condense_factor - 1
+        stage = next(
+            (
+                i
+                for i in range(self.condense_factor - 1)
+                if current_progress * 2 < (i + 1) / (self.condense_factor - 1)
+            ),
+            self.condense_factor - 1,
+        )
+
         # Check for actual dropping
         if not self.reach_stage(stage):
             self.stage = stage

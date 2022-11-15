@@ -15,7 +15,7 @@ class ERF(nn.Module):
         self.config = config
         self.num_classes = self.config.num_classes
 
-        if encoder == None:
+        if encoder is None:
             self.encoder_flag = True
             self.encoder_layers = nn.ModuleList()
 

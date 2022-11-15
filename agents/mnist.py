@@ -109,7 +109,7 @@ class MnistAgent(BaseAgent):
         Main training loop
         :return:
         """
-        for epoch in range(1, self.config.max_epoch + 1):
+        for _ in range(1, self.config.max_epoch + 1):
             self.train_one_epoch()
             self.validate()
 

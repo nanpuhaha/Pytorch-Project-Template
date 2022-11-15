@@ -43,9 +43,7 @@ class DQN(nn.Module):
         x = self.bn3(x)
         x = self.relu(x)
 
-        out = self.linear(x.view(x.size(0), -1))
-
-        return out
+        return self.linear(x.view(x.size(0), -1))
 
 
 """

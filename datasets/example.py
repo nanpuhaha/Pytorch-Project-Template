@@ -13,10 +13,7 @@ class ExampleDataLoader:
         :param config:
         """
         self.config = config
-        if config.data_mode == "imgs":
-            raise NotImplementedError("This mode is not implemented YET")
-
-        elif config.data_mode == "numpy":
+        if config.data_mode in ["imgs", "numpy"]:
             raise NotImplementedError("This mode is not implemented YET")
 
         elif config.data_mode == "random":

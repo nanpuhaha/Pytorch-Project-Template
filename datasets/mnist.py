@@ -29,10 +29,7 @@ class MnistDataLoader:
                     transforms.Normalize((0.1307,), (0.3081,))
                 ])),
                 batch_size=self.config.test_batch_size, shuffle=True, num_workers=self.config.data_loader_workers, pin_memory=self.config.pin_memory)
-        elif config.data_mode == "imgs":
-            raise NotImplementedError("This mode is not implemented YET")
-
-        elif config.data_mode == "numpy":
+        elif config.data_mode in ["imgs", "numpy"]:
             raise NotImplementedError("This mode is not implemented YET")
 
         elif config.data_mode == "random":
